@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_ledger_pulse_root"
+              name="LedgerPulse"
+              sequence="10"
+              web_icon="base,static/description/icon.png"
+              groups="group_pulse_user"/>
+
+    <!-- Finance -->
+    <menuitem id="menu_pulse_finance" name="Finance" parent="menu_ledger_pulse_root"
+              sequence="10" groups="group_pulse_user"/>
+    <menuitem id="menu_pulse_cash_bridge" name="Cash Bridge" parent="menu_pulse_finance"
+              action="pulse_cash_bridge_action" sequence="10"/>
+    <menuitem id="menu_pulse_close_checklist" name="Close Checklist" parent="menu_pulse_finance"
+              action="pulse_close_checklist_action" sequence="20"/>
+
+    <!-- Monitoring -->
+    <menuitem id="menu_pulse_monitoring" name="Monitoring" parent="menu_ledger_pulse_root"
+              sequence="20" groups="group_pulse_user"/>
+    <menuitem id="menu_pulse_events" name="Events" parent="menu_pulse_monitoring"
+              action="pulse_event_action" sequence="10"/>
+    <menuitem id="menu_pulse_jobs" name="Background Jobs" parent="menu_pulse_monitoring"
+              action="pulse_job_action" sequence="20" groups="group_pulse_manager"/>
+    <menuitem id="menu_pulse_request_logs" name="API Request Logs" parent="menu_pulse_monitoring"
+              action="pulse_request_log_action" sequence="30" groups="group_pulse_manager"/>
+
+    <!-- Configuration -->
+    <menuitem id="menu_pulse_config_root" name="Configuration" parent="menu_ledger_pulse_root"
+              sequence="90" groups="group_pulse_manager"/>
+    <menuitem id="menu_pulse_score_rules" name="Scoring Rules" parent="menu_pulse_config_root"
+              action="score_rule_action" sequence="10" groups="group_pulse_manager"/>
+    <menuitem id="menu_pulse_config" name="Settings" parent="menu_pulse_config_root"
+              action="pulse_config_action" sequence="20" groups="group_pulse_integration_admin"/>
+    <menuitem id="menu_pulse_api_keys" name="API Keys" parent="menu_pulse_config_root"
+              action="pulse_api_key_action" sequence="30" groups="group_pulse_integration_admin"/>
+</odoo>

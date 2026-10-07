@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ===== record rules ===== -->
+    <record id="rule_pulse_bank_match_company" model="ir.rule">
+        <field name="name">Pulse Bank Match: multi-company</field>
+        <field name="model_id" ref="model_pulse_bank_match"/>
+        <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+    </record>
+    <record id="rule_pulse_budget_company" model="ir.rule">
+        <field name="name">Pulse Budget: multi-company</field>
+        <field name="model_id" ref="model_pulse_budget"/>
+        <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+    </record>
+    <record id="rule_pulse_webhook_receipt_company" model="ir.rule">
+        <field name="name">Pulse Webhook Receipt: multi-company</field>
+        <field name="model_id" ref="model_pulse_webhook_receipt"/>
+        <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <!-- ===== config: new fields ===== -->
+    <record id="pulse_config_view_form_ext" model="ir.ui.view">
+        <field name="name">pulse.config.form.ext</field>
+        <field name="model">pulse.config</field>
+        <field name="inherit_id" ref="ledger_pulse.pulse_config_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='bus_channel']" position="after">
+                <field name="invoice_product_id"/>
+                <field name="invoice_payment_term_id"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ===== cash bridge: buttons ===== -->
+    <record id="pulse_cash_bridge_view_form_ext" model="ir.ui.view">
+        <field name="name">pulse.cash.bridge.form.ext</field>
+        <field name="model">pulse.cash.bridge</field>
+        <field name="inherit_id" ref="ledger_pulse.pulse_cash_bridge_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="before">
+                <header>
+                    <button name="action_post_invoice" type="object" string="Post Invoice"
+                            class="btn-primary" invisible="state != 'draft'"
+                            groups="account.group_account_invoice"/>
+                    <button name="action_open_invoice" type="object" string="Open Invoice"/>
+                </header>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ===== bank matches ===== -->
+    <record id="pulse_bank_match_view_tree" model="ir.ui.view">
+        <field name="name">pulse.bank.match.tree</field>
+        <field name="model">pulse.bank.match</field>
+        <field name="arch" type="xml">
+            <tree create="0">
+                <field name="statement_line_id"/>
+                <field name="kind"/>
+                <field name="payment_ids" widget="many2many_tags"/>
+                <field name="account_id"/>
+                <field name="clearing_move_id"/>
+                <field name="note"/>
+            </tree>
+        </field>
+    </record>
+    <record id="pulse_bank_match_action" model="ir.actions.act_window">
+        <field name="name">Bank Matches</field>
+        <field name="res_model">pulse.bank.match</field>
+        <field name="view_mode">tree</field>
+    </record>
+
+    <!-- ===== statement lines (all + exceptions) ===== -->
+    <record id="pulse_stmt_line_view_tree" model="ir.ui.view">
+        <field name="name">pulse.account.bank.statement.line.tree</field>
+        <field name="model">account.bank.statement.line</field>
+        <field name="priority">90</field>
+        <field name="arch" type="xml">
+            <tree create="0" edit="0" decoration-danger="not pulse_matched">
+                <field name="date"/>
+                <field name="payment_ref"/>
+                <field name="partner_id"/>
+                <field name="journal_id"/>
+                <field name="amount"/>
+                <field name="pulse_matched"/>
+            </tree>
+        </field>
+    </record>
+    <record id="pulse_stmt_lines_action" model="ir.actions.act_window">
+        <field name="name">Statement Lines</field>
+        <field name="res_model">account.bank.statement.line</field>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="pulse_stmt_line_view_tree"/>
+    </record>
+    <record id="pulse_stmt_exceptions_action" model="ir.actions.act_window">
+        <field name="name">Reconciliation Exceptions (older than 7 days)</field>
+        <field name="res_model">account.bank.statement.line</field>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="pulse_stmt_line_view_tree"/>
+        <field name="domain">[('pulse_matched', '=', False), ('date', '&lt;=', (context_today() - relativedelta(days=7)).strftime('%Y-%m-%d'))]</field>
+    </record>
+
+    <!-- ===== budgets ===== -->
+    <record id="pulse_budget_view_tree" model="ir.ui.view">
+        <field name="name">pulse.budget.tree</field>
+        <field name="model">pulse.budget</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="team_id"/>
+                <field name="date_from"/>
+                <field name="date_to"/>
+                <field name="planned_revenue"/>
+                <field name="actual_revenue"/>
+                <field name="variance"/>
+                <field name="achievement"/>
+            </tree>
+        </field>
+    </record>
+    <record id="pulse_budget_view_form" model="ir.ui.view">
+        <field name="name">pulse.budget.form</field>
+        <field name="model">pulse.budget</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="team_id"/>
+                            <field name="company_id"/>
+                        </group>
+                        <group>
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                            <field name="planned_revenue"/>
+                            <field name="actual_revenue"/>
+                            <field name="variance"/>
+                            <field name="achievement"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="pulse_budget_action" model="ir.actions.act_window">
+        <field name="name">Team Budgets</field>
+        <field name="res_model">pulse.budget</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- ===== period close wizard ===== -->
+    <record id="pulse_close_wizard_view_form" model="ir.ui.view">
+        <field name="name">pulse.close.wizard.form</field>
+        <field name="model">pulse.close.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Period Close">
+                <group>
+                    <group>
+                        <field name="period"/>
+                        <field name="company_id"/>
+                    </group>
+                    <group>
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                        <field name="can_lock"/>
+                    </group>
+                </group>
+                <field name="result_html" nolabel="1" widget="html" readonly="1"/>
+                <footer>
+                    <button name="action_run_checks" type="object" string="Run Checks" class="btn-primary"/>
+                    <button name="action_lock" type="object" string="Lock Period" invisible="not can_lock"/>
+                    <button name="action_statements" type="object" string="Trial Balance / P&amp;L / Balance Sheet"/>
+                    <button string="Close" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="pulse_close_wizard_action" model="ir.actions.act_window">
+        <field name="name">Period Close</field>
+        <field name="res_model">pulse.close.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <!-- ===== team profitability (analytic lines of Pulse team accounts) ===== -->
+    <record id="pulse_team_profit_action" model="ir.actions.act_window">
+        <field name="name">Team Profitability (Analytic)</field>
+        <field name="res_model">account.analytic.line</field>
+        <field name="view_mode">tree</field>
+        <field name="domain">[('account_id.name', '=like', 'Pulse Team:%')]</field>
+        <field name="context">{'group_by': ['account_id']}</field>
+    </record>
+
+    <!-- ===== menus ===== -->
+    <menuitem id="menu_pulse_period_close" name="Period Close" parent="menu_pulse_finance"
+              action="pulse_close_wizard_action" sequence="30" groups="group_pulse_manager"/>
+    <menuitem id="menu_pulse_bank_matches" name="Bank Matches" parent="menu_pulse_finance"
+              action="pulse_bank_match_action" sequence="40" groups="group_pulse_manager"/>
+    <menuitem id="menu_pulse_stmt_lines" name="Statement Lines" parent="menu_pulse_finance"
+              action="pulse_stmt_lines_action" sequence="50" groups="group_pulse_manager"/>
+    <menuitem id="menu_pulse_stmt_exceptions" name="Reconciliation Exceptions" parent="menu_pulse_finance"
+              action="pulse_stmt_exceptions_action" sequence="55" groups="group_pulse_manager"/>
+    <menuitem id="menu_pulse_budgets" name="Team Budgets" parent="menu_pulse_finance"
+              action="pulse_budget_action" sequence="60" groups="group_pulse_manager"/>
+    <menuitem id="menu_pulse_team_profit" name="Team Profitability" parent="menu_pulse_finance"
+              action="pulse_team_profit_action" sequence="70" groups="group_pulse_manager"/>
+</odoo>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="rule_pulse_sla_policy_company" model="ir.rule">
+        <field name="name">Pulse SLA Policy: multi-company</field>
+        <field name="model_id" ref="model_pulse_sla_policy"/>
+        <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="pulse_sla_policy_view_tree" model="ir.ui.view">
+        <field name="name">pulse.sla.policy.tree</field>
+        <field name="model">pulse.sla.policy</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="team_id"/>
+                <field name="source_channel"/>
+                <field name="hours"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+    <record id="pulse_sla_policy_action" model="ir.actions.act_window">
+        <field name="name">SLA Policies</field>
+        <field name="res_model">pulse.sla.policy</field>
+        <field name="view_mode">tree</field>
+    </record>
+
+    <record id="pulse_dashboard_action" model="ir.actions.client">
+        <field name="name">LedgerPulse Dashboard</field>
+        <field name="tag">ledger_pulse.dashboard</field>
+    </record>
+
+    <menuitem id="menu_pulse_dashboard" name="Dashboard" parent="menu_ledger_pulse_root"
+              action="pulse_dashboard_action" sequence="1" groups="group_pulse_user"/>
+    <menuitem id="menu_pulse_sla_policies" name="SLA Policies" parent="menu_pulse_config_root"
+              action="pulse_sla_policy_action" sequence="15" groups="group_pulse_manager"/>
+</odoo>

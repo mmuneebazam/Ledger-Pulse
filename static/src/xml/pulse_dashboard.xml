@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="ledger_pulse.PulseInvoiceStatusBadge">
+        <span t-attf-class="badge text-bg-#{info.color}">
+            <i t-attf-class="fa #{info.icon} me-1" aria-hidden="true"/>
+            <t t-esc="info.label"/>
+        </span>
+    </t>
+
+    <t t-name="ledger_pulse.PulseKpiStrip">
+        <div class="row g-3 mb-3" role="list">
+            <div class="col-6 col-lg-3" role="listitem">
+                <div class="o_pulse_kpi card p-3">
+                    <div class="text-muted">New leads today</div>
+                    <div class="o_pulse_kpi_value" t-esc="props.kpis.new_leads_today"/>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3" role="listitem">
+                <div class="o_pulse_kpi card p-3">
+                    <div class="text-muted"><i class="fa fa-exclamation-circle me-1" aria-hidden="true"/>SLA breaches</div>
+                    <div class="o_pulse_kpi_value" t-esc="props.kpis.sla_breaches"/>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3" role="listitem">
+                <div class="o_pulse_kpi card p-3">
+                    <div class="text-muted">Won this month</div>
+                    <div class="o_pulse_kpi_value" t-esc="props.kpis.won_this_month"/>
+                    <div class="text-muted small" t-esc="money(props.kpis.won_revenue)"/>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3" role="listitem">
+                <div class="o_pulse_kpi card p-3">
+                    <div class="text-muted"><i class="fa fa-exclamation-triangle me-1" aria-hidden="true"/>Overdue invoices</div>
+                    <t t-if="props.canSeeFinance">
+                        <div class="o_pulse_kpi_value" t-esc="props.kpis.overdue_invoices"/>
+                        <div class="text-muted small" t-esc="money(props.kpis.overdue_amount)"/>
+                    </t>
+                    <t t-else="">
+                        <div class="text-muted">Accounting access required</div>
+                    </t>
+                </div>
+            </div>
+        </div>
+    </t>
+
+    <t t-name="ledger_pulse.PulseLeadCard">
+        <div t-attf-class="o_pulse_card card p-3 #{sla.cls}" t-on-click="() => props.onOpen(props.lead.id)" role="button" tabindex="0">
+            <div class="d-flex justify-content-between align-items-start">
+                <div class="fw-bold" t-esc="props.lead.name"/>
+                <span t-attf-class="badge text-bg-#{scoreColor}">Score <t t-esc="props.lead.score"/></span>
+            </div>
+            <div class="text-muted small">
+                <t t-esc="props.lead.team_name or 'No team'"/> ·
+                <t t-esc="props.lead.channel"/> ·
+                <t t-esc="money"/>
+            </div>
+            <div class="d-flex justify-content-between align-items-center mt-2">
+                <span class="o_pulse_sla">
+                    <i t-attf-class="fa #{sla.icon} me-1" aria-hidden="true"/><t t-esc="sla.text"/>
+                </span>
+                <PulseInvoiceStatusBadge state="props.lead.invoice_badge"/>
+            </div>
+        </div>
+    </t>
+
+    <t t-name="ledger_pulse.PulseLeadList">
+        <div class="o_pulse_list">
+            <div class="o_pulse_grid">
+                <t t-foreach="visible" t-as="lead" t-key="lead.id">
+                    <PulseLeadCard lead="lead" currency="props.currency" now="props.now" onOpen="props.onOpen"/>
+                </t>
+            </div>
+            <div t-if="!props.leads.length" class="text-muted p-3">No leads match the filters.</div>
+            <div t-if="props.leads.length gt state.limit" class="text-center mt-3">
+                <button class="btn btn-secondary" t-on-click="showMore">Show more</button>
+            </div>
+        </div>
+    </t>
+
+    <t t-name="ledger_pulse.PulseToast">
+        <div class="o_pulse_toasts" aria-live="polite" role="status">
+            <t t-foreach="props.toasts" t-as="toast" t-key="toast.id">
+                <div t-attf-class="o_pulse_toast alert alert-#{toast.type} d-flex justify-content-between">
+                    <div><strong t-esc="toast.title"/><div t-esc="toast.message"/></div>
+                    <button type="button" class="btn-close" aria-label="Dismiss" t-on-click="() => props.onDismiss(toast.id)"/>
+                </div>
+            </t>
+        </div>
+    </t>
+
+    <t t-name="ledger_pulse.PulseDashboard">
+        <div class="o_pulse_dashboard p-3 overflow-auto h-100">
+            <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+                <h3 class="mb-0">LedgerPulse</h3>
+                <div class="d-flex gap-2 align-items-center">
+                    <span t-foreach="state.snapshot.closed_periods" t-as="period" t-key="period" class="badge text-bg-secondary">
+                        <i class="fa fa-lock me-1" aria-hidden="true"/><t t-esc="period"/>: closed
+                    </span>
+                    <select class="form-select form-select-sm" t-on-change="onChannelChange" aria-label="Channel filter">
+                        <t t-foreach="channelOptions" t-as="ch" t-key="ch">
+                            <option t-att-value="ch" t-att-selected="state.filters.channel === ch">
+                                <t t-esc="ch or 'All channels'"/>
+                            </option>
+                        </t>
+                    </select>
+                    <input type="number" min="0" max="100" class="form-control form-control-sm" style="width: 110px;"
+                           placeholder="Min score" t-att-value="state.filters.min_score" t-on-change="onMinScoreChange"/>
+                </div>
+            </div>
+            <PulseKpiStrip kpis="state.snapshot.kpis" currency="state.snapshot.currency" canSeeFinance="state.snapshot.can_see_finance"/>
+            <PulseLeadList leads="state.snapshot.leads" currency="state.snapshot.currency" now="state.now" onOpen.bind="openLead"/>
+            <PulseToast toasts="state.toasts" onDismiss.bind="dismissToast"/>
+        </div>
+    </t>
+
+</templates>

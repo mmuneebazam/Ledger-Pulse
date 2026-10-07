@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ===== Config ===== -->
+    <record id="pulse_config_view_tree" model="ir.ui.view">
+        <field name="name">pulse.config.tree</field>
+        <field name="model">pulse.config</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="company_id"/>
+                <field name="api_version"/>
+                <field name="rate_limit_per_min"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+    <record id="pulse_config_view_form" model="ir.ui.view">
+        <field name="name">pulse.config.form</field>
+        <field name="model">pulse.config</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="company_id"/>
+                            <field name="active"/>
+                        </group>
+                        <group>
+                            <field name="api_version"/>
+                            <field name="rate_limit_per_min"/>
+                            <field name="jwt_secret_ref"/>
+                            <field name="bus_channel"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="pulse_config_action" model="ir.actions.act_window">
+        <field name="name">Configuration</field>
+        <field name="res_model">pulse.config</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- ===== API Keys ===== -->
+    <record id="pulse_api_key_view_tree" model="ir.ui.view">
+        <field name="name">pulse.api.key.tree</field>
+        <field name="model">pulse.api.key</field>
+        <field name="arch" type="xml">
+            <tree decoration-danger="revoked">
+                <field name="name"/>
+                <field name="key_prefix"/>
+                <field name="scopes"/>
+                <field name="partner_id"/>
+                <field name="expires_at"/>
+                <field name="revoked"/>
+            </tree>
+        </field>
+    </record>
+    <record id="pulse_api_key_view_form" model="ir.ui.view">
+        <field name="name">pulse.api.key.form</field>
+        <field name="model">pulse.api.key</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_generate_key" type="object"
+                            string="Generate / Regenerate Key" class="btn-primary"/>
+                    <button name="action_revoke" type="object" string="Revoke"
+                            invisible="revoked"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="partner_id"/>
+                            <field name="company_id"/>
+                            <field name="scopes"/>
+                        </group>
+                        <group>
+                            <field name="key_prefix"/>
+                            <field name="expires_at"/>
+                            <field name="deprecated_until"/>
+                            <field name="revoked"/>
+                            <field name="last_used_at"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="pulse_api_key_action" model="ir.actions.act_window">
+        <field name="name">API Keys</field>
+        <field name="res_model">pulse.api.key</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- ===== Score rules ===== -->
+    <record id="score_rule_view_tree" model="ir.ui.view">
+        <field name="name">crm.lead.score.rule.tree</field>
+        <field name="model">crm.lead.score.rule</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="field_id"/>
+                <field name="operator"/>
+                <field name="value"/>
+                <field name="points"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+    <record id="score_rule_action" model="ir.actions.act_window">
+        <field name="name">Scoring Rules</field>
+        <field name="res_model">crm.lead.score.rule</field>
+        <field name="view_mode">tree</field>
+    </record>
+
+    <!-- ===== Events ===== -->
+    <record id="pulse_event_view_tree" model="ir.ui.view">
+        <field name="name">pulse.event.tree</field>
+        <field name="model">pulse.event</field>
+        <field name="arch" type="xml">
+            <tree decoration-danger="state == 'failed'" decoration-success="state == 'dispatched'">
+                <field name="create_date"/>
+                <field name="event_type"/>
+                <field name="res_model"/>
+                <field name="res_id"/>
+                <field name="state"/>
+                <field name="retry_count"/>
+            </tree>
+        </field>
+    </record>
+    <record id="pulse_event_view_form" model="ir.ui.view">
+        <field name="name">pulse.event.form</field>
+        <field name="model">pulse.event</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="event_type"/>
+                            <field name="res_model"/>
+                            <field name="res_id"/>
+                            <field name="team_id"/>
+                            <field name="company_id"/>
+                        </group>
+                        <group>
+                            <field name="state"/>
+                            <field name="retry_count"/>
+                            <field name="dispatched_at"/>
+                        </group>
+                    </group>
+                    <group string="Payload"><field name="payload" nolabel="1"/></group>
+                    <group string="Error"><field name="error" nolabel="1"/></group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="pulse_event_action" model="ir.actions.act_window">
+        <field name="name">Events</field>
+        <field name="res_model">pulse.event</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- ===== Jobs ===== -->
+    <record id="pulse_job_view_tree" model="ir.ui.view">
+        <field name="name">pulse.job.tree</field>
+        <field name="model">pulse.job</field>
+        <field name="arch" type="xml">
+            <tree decoration-danger="state == 'failed'" decoration-success="state == 'done'">
+                <field name="name"/>
+                <field name="state"/>
+                <field name="started_at"/>
+                <field name="finished_at"/>
+            </tree>
+        </field>
+    </record>
+    <record id="pulse_job_view_form" model="ir.ui.view">
+        <field name="name">pulse.job.form</field>
+        <field name="model">pulse.job</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="state"/>
+                            <field name="company_id"/>
+                        </group>
+                        <group>
+                            <field name="started_at"/>
+                            <field name="finished_at"/>
+                        </group>
+                    </group>
+                    <group string="Arguments"><field name="args" nolabel="1"/></group>
+                    <group string="Result"><field name="result" nolabel="1"/></group>
+                    <group string="Error"><field name="error" nolabel="1"/></group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="pulse_job_action" model="ir.actions.act_window">
+        <field name="name">Background Jobs</field>
+        <field name="res_model">pulse.job</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- ===== Request logs ===== -->
+    <record id="pulse_request_log_view_tree" model="ir.ui.view">
+        <field name="name">pulse.request.log.tree</field>
+        <field name="model">pulse.request.log</field>
+        <field name="arch" type="xml">
+            <tree create="0" decoration-danger="status_code &gt;= 400">
+                <field name="create_date"/>
+                <field name="api_key_id"/>
+                <field name="method"/>
+                <field name="endpoint"/>
+                <field name="status_code"/>
+                <field name="latency_ms"/>
+            </tree>
+        </field>
+    </record>
+    <record id="pulse_request_log_action" model="ir.actions.act_window">
+        <field name="name">API Request Logs</field>
+        <field name="res_model">pulse.request.log</field>
+        <field name="view_mode">tree</field>
+    </record>
+
+    <!-- ===== Cash bridge ===== -->
+    <record id="pulse_cash_bridge_view_tree" model="ir.ui.view">
+        <field name="name">pulse.cash.bridge.tree</field>
+        <field name="model">pulse.cash.bridge</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="lead_id"/>
+                <field name="move_id"/>
+                <field name="payment_id"/>
+                <field name="state"/>
+                <field name="linked_at"/>
+            </tree>
+        </field>
+    </record>
+    <record id="pulse_cash_bridge_view_form" model="ir.ui.view">
+        <field name="name">pulse.cash.bridge.form</field>
+        <field name="model">pulse.cash.bridge</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="lead_id"/>
+                            <field name="move_id"/>
+                            <field name="payment_id"/>
+                        </group>
+                        <group>
+                            <field name="state"/>
+                            <field name="linked_at"/>
+                            <field name="company_id"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="pulse_cash_bridge_action" model="ir.actions.act_window">
+        <field name="name">Cash Bridge</field>
+        <field name="res_model">pulse.cash.bridge</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- ===== Close checklist ===== -->
+    <record id="pulse_close_checklist_view_tree" model="ir.ui.view">
+        <field name="name">pulse.close.checklist.tree</field>
+        <field name="model">pulse.close.checklist</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom" decoration-success="done">
+                <field name="period"/>
+                <field name="date_from"/>
+                <field name="date_to"/>
+                <field name="task"/>
+                <field name="done"/>
+                <field name="done_by"/>
+                <field name="done_at"/>
+                <field name="note"/>
+                <button name="action_mark_done" type="object" string="Mark Done"
+                        icon="fa-check" invisible="done"/>
+            </tree>
+        </field>
+    </record>
+    <record id="pulse_close_checklist_action" model="ir.actions.act_window">
+        <field name="name">Close Checklist</field>
+        <field name="res_model">pulse.close.checklist</field>
+        <field name="view_mode">tree</field>
+    </record>
+</odoo>

@@ -1,0 +1,19 @@
+.o_pulse_dashboard {
+    .o_pulse_kpi_value { font-size: 2rem; font-weight: 700; line-height: 1.1; }
+    .o_pulse_grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 12px;
+    }
+    .o_pulse_card {
+        cursor: pointer;
+        border-left: 4px solid transparent;
+        &:hover { box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15); }
+        // breached: thick border + icon + text (not colour alone)
+        &.o_pulse_breached { border: 2px solid #dc3545; border-left-width: 8px; }
+        &.o_pulse_breached .o_pulse_sla { font-weight: 700; text-decoration: underline; }
+    }
+    .o_pulse_toasts {
+        position: fixed; top: 70px; right: 20px; z-index: 1100; width: 320px;
+    }
+}

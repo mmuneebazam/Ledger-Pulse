@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="cron_pulse_sla_sweep" model="ir.cron">
+        <field name="name">LedgerPulse: sweep SLA breaches</field>
+        <field name="model_id" ref="crm.model_crm_lead"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_pulse_sweep_sla()</field>
+        <field name="interval_number">5</field>
+        <field name="interval_type">minutes</field>
+        <field name="numbercall">-1</field>
+        <field name="user_id" ref="base.user_root"/>
+    </record>
+    <record id="cron_pulse_retry_events" model="ir.cron">
+        <field name="name">LedgerPulse: retry failed events</field>
+        <field name="model_id" ref="model_pulse_event"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_retry_failed()</field>
+        <field name="interval_number">5</field>
+        <field name="interval_type">minutes</field>
+        <field name="numbercall">-1</field>
+        <field name="user_id" ref="base.user_root"/>
+    </record>
+    <record id="cron_pulse_nightly_rescore" model="ir.cron">
+        <field name="name">LedgerPulse: nightly lead rescore</field>
+        <field name="model_id" ref="crm.model_crm_lead"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_pulse_nightly_rescore()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">-1</field>
+        <field name="user_id" ref="base.user_root"/>
+    </record>
+    <record id="cron_pulse_gc_rate_limit" model="ir.cron">
+        <field name="name">LedgerPulse: purge old rate-limit buckets</field>
+        <field name="model_id" ref="model_pulse_rate_limit"/>
+        <field name="state">code</field>
+        <field name="code">model._gc_old_buckets()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">hours</field>
+        <field name="numbercall">-1</field>
+        <field name="user_id" ref="base.user_root"/>
+    </record>
+    <record id="cron_pulse_gc_idempotency" model="ir.cron">
+        <field name="name">LedgerPulse: purge old idempotency records</field>
+        <field name="model_id" ref="model_pulse_idempotency"/>
+        <field name="state">code</field>
+        <field name="code">model._gc_old_records()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">-1</field>
+        <field name="user_id" ref="base.user_root"/>
+    </record>
+    <record id="cron_pulse_bank_auto_match" model="ir.cron">
+        <field name="name">LedgerPulse: auto-match bank statement lines</field>
+        <field name="model_id" ref="model_pulse_bank_match"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_auto_match()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">-1</field>
+        <field name="user_id" ref="base.user_root"/>
+    </record>
+    <record id="cron_pulse_period_closed" model="ir.cron">
+        <field name="name">LedgerPulse: emit period.closed events</field>
+        <field name="model_id" ref="model_pulse_close_checklist"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_emit_period_closed()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">hours</field>
+        <field name="numbercall">-1</field>
+        <field name="user_id" ref="base.user_root"/>
+    </record>
+</odoo>
