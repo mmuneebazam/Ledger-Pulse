@@ -1,5 +1,10 @@
 # Ledger Pulse
 
+[![Odoo](https://img.shields.io/badge/Odoo-17-714B67?logo=odoo)](https://www.odoo.com/)
+[![License](https://img.shields.io/badge/License-LGPL--3.0-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
+[![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![Status](https://img.shields.io/badge/Status-Active-success)](https://github.com/mmuneebazam/Ledger-Pulse)
+
 Ledger Pulse is a custom Odoo 17 addon designed to connect CRM workflows, sales intelligence, API-driven lead intake, and accounting operations in a single real-time module.
 
 It provides a modern ledger-style operational layer for processing incoming leads, assigning scores, enforcing SLA policies, surfacing dashboard insights, and bridging CRM activity into accounting-related workflows.
