@@ -5,6 +5,14 @@
 [![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![Status](https://img.shields.io/badge/Status-Active-success)](https://github.com/mmuneebazam/Ledger-Pulse)
 
+<div align="center">
+
+  <img src="https://raw.githubusercontent.com/odoo/odoo/17.0/static/img/odoo_logo.svg" alt="Odoo Logo" width="180" />
+
+  <h3>CRM intelligence, SLA automation, and accounting bridge for Odoo</h3>
+
+</div>
+
 Ledger Pulse is a custom Odoo 17 addon designed to connect CRM workflows, sales intelligence, API-driven lead intake, and accounting operations in a single real-time module.
 
 It provides a modern ledger-style operational layer for processing incoming leads, assigning scores, enforcing SLA policies, surfacing dashboard insights, and bridging CRM activity into accounting-related workflows.
@@ -80,6 +88,82 @@ git clone https://github.com/mmuneebazam/Ledger-Pulse.git
 ```
 
 Then place the project in your Odoo addons path or symlink it into `custom_addons`.
+
+## Architecture
+
+```mermaid
+flowchart LR
+    A[External Lead Sources / Webhooks / API Clients] --> B[Ledger Pulse Controllers]
+    B --> C[Auth + Rate Limiting + Validation]
+    C --> D[CRM Lead Model]
+    D --> E[Scoring Engine]
+    D --> F[SLA Engine]
+    D --> G[Event Bus + Real-time Notifications]
+    D --> H[Accounting / Cash Bridge]
+    H --> I[Odoo Accounting and Finance Records]
+    D --> J[Dashboard / Reports / Views]
+    J --> K[Backend Users]
+```
+
+## Full Odoo installation guide
+
+### 1) Prepare the environment
+
+Make sure your Odoo 17 instance is installed and running with a valid PostgreSQL database.
+
+```bash
+# Example folder layout
+/opt/odoo17/
+├── odoo/
+├── addons/
+├── custom_addons/
+└── .venv/
+```
+
+### 2) Add the module to Odoo
+
+Clone the repository into your Odoo custom addons directory:
+
+```bash
+git clone https://github.com/mmuneebazam/Ledger-Pulse.git /opt/odoo17/custom_addons/ledger_pulse
+```
+
+Then update your Odoo config file, for example `odoo.conf`:
+
+```ini
+addons_path = /opt/odoo17/odoo/addons,/opt/odoo17/addons,/opt/odoo17/custom_addons
+```
+
+### 3) Install Python dependencies
+
+If your Odoo environment does not already include the needed Python packages, install them from your project environment:
+
+```bash
+pip install -r requirements.txt
+```
+
+### 4) Start the Odoo server
+
+```bash
+/opt/odoo17/odoo-bin -c /etc/odoo/odoo.conf
+```
+
+### 5) Install the module in Odoo
+
+1. Log in to Odoo as a user with admin rights.
+2. Open the Apps menu.
+3. Click Update Apps List.
+4. Search for `LedgerPulse`.
+5. Click Install.
+
+### 6) Initial configuration
+
+After installation:
+
+- open the Ledger Pulse settings/configuration area
+- define the company-level configuration record
+- set API keys and rates as needed
+- configure scoring and SLA policies for your business rules
 
 ## Configuration
 
